@@ -1,0 +1,123 @@
+
+struct VertexDataInput {
+	float4 vertex: POSITION;
+	float3 color: COLOR;
+	float3 normal: NORMAL0;
+};
+
+struct VertexDataOutput {
+	float4 projv  : POSITION;
+	float3 color : COLOR;
+	float3 xyz: TEXCOORD0;
+	float3 normal: TEXCOORD1;
+};
+
+struct PixelDataOutput {
+	
+	float3 xyz : COLOR0;
+	float3 color: COLOR;
+	
+};
+
+
+VertexDataOutput VertexMain(VertexDataInput vdi, 
+  uniform float4x4 modelViewProj) {
+
+  VertexDataOutput ret;
+  ret.projv = mul(modelViewProj, vdi.vertex);
+  ret.color = vdi.color;
+  ret.xyz = vdi.vertex.xyz;
+  ret.normal = vdi.normal;
+  return ret;
+
+}
+
+TRIANGLE void GeometryMain(AttribArray<VertexDataOutput> tverts,
+	uniform float4x4 modelViewProj) {
+
+	emitVertex(tverts[0]);
+	emitVertex(tverts[1]);
+	emitVertex(tverts[2]);
+	return;
+
+}
+
+PixelDataOutput FragmentMainOLD(VertexDataOutput pdi, 
+	uniform float blueHue, uniform float3 center, 
+	uniform float3 eye) {
+
+  PixelDataOutput ret;
+  ret.color = pdi.color;
+  eye = eye / 128.0f;
+  eye = (eye + float3(1.0f, 1.0f, 1.0f))/2.0f;
+  ret.color.rgb = eye;
+//  ret.color.rgb = center;
+//  ret.color.b = ret.color.b + (1.0f - ret.color.b)*blueHue;
+  return ret;
+
+}
+
+PixelDataOutput FragmentMain(VertexDataOutput pdi,
+	uniform float3 eye, uniform float3 C0, 
+	uniform float3 C1) {
+
+  PixelDataOutput ret;
+
+  float3 eyev = normalize(eye-pdi.xyz);
+  ret.color = (eyev + float3(1.0f, 1.0f, 1.0f))/2.0f;
+
+
+// visualization of normal
+//	ret.color = (pdi.normal + float3(1.0f, 1.0f, 1.0f))/2.0f;
+
+// visualization of (x, y, z)
+//  ret.color.rgb = float3(0.0f, 0.0f, 0.0f);
+//  ret.color.r = (pdi.xyz - C0).x / (C1.x-C0.x);
+
+//  ret.color = pdi.color;
+  return ret;
+
+}
+
+
+
+PixelDataOutput BillboardReflectionFragmentShader(VertexDataOutput pdi,
+	uniform float3 billboard00,uniform float3 billboard01,uniform float3 billboard10,uniform float3 billboard11,
+	uniform float3 cam, uniform sampler2D texture) {
+
+	PixelDataOutput I;
+	
+	float3 normal =pdi.normal;
+	float3 xyzAtPixel =pdi.xyz;
+	float3 eye =cam;
+	float3 eyeVector=normalize(eye-xyzAtPixel);
+	float3 r =reflect(eyeVector,normal);
+
+	float3 helperunitnormal=normalize(cross(billboard01-billboard00,billboard10-billboard00));
+	float canshu;
+	canshu=dot(billboard00-xyzAtPixel,helperunitnormal)/dot(r,helperunitnormal);
+	r=(canshu)*r;
+	float3 Ipoint=xyzAtPixel+r;
+	float edge0=dot(Ipoint-billboard00,billboard01-billboard00);
+	float edge1=dot(Ipoint-billboard00,billboard10-billboard00);
+	float edge2=dot(Ipoint-billboard11,billboard01-billboard11);
+	float edge3=dot(Ipoint-billboard11,billboard10-billboard11);
+	if(edge0>0 && edge1>0 && edge2>0 &&edge3>0){
+		float x=edge0/distance(billboard01,billboard00);
+		float y=edge1/distance(billboard10,billboard00);
+		float s=x/length(billboard01-billboard00);
+		float t=y/length(billboard10-billboard00);
+	float2 texcoord=float2(s, 1-t);
+	I.color=tex2D(texture,texcoord);
+	if(canshu>0){
+		I.color=pdi.color;
+	}
+	if(I.color.x==1.0 && I.color.y==1.0 && I.color.z==1.0 )
+		I.color=pdi.color;
+	}
+	else{
+		I.color=pdi.color;
+	}
+	
+	return I;
+}

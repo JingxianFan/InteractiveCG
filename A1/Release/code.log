@@ -1,0 +1,17 @@
+﻿生成启动时间为 9/11/2015 1:17:50 PM。
+项目“C:\Users\faye\Desktop\A1\code.vcxproj”在节点 2 上(build 个目标)。
+InitializeBuildStatus:
+  正在创建“Release\code.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  所有输出均为最新。
+Link:
+  所有输出均为最新。
+  code.vcxproj -> C:\Users\faye\Desktop\A1\Release\code.exe
+FinalizeBuildStatus:
+  正在删除文件“Release\code.unsuccessfulbuild”。
+  正在对“Release\code.lastbuildstate”执行 Touch 任务。
+已完成生成项目“C:\Users\faye\Desktop\A1\code.vcxproj”(build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.11

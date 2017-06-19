@@ -1,0 +1,39 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0108 
+header_name {.h} 
+code_name {.cxx}
+class GUI {open
+} {
+  decl {\#include "scene.h"} {}
+  Function {GUI()} {open
+  } {
+    Fl_Window uiw {
+      label GUI open
+      xywh {675 144 265 290} type Double visible
+    } {
+      Fl_Button {} {
+        label DBG
+        callback {DBG_cb()}
+        xywh {15 15 225 40} selection_color 72
+      }
+      Fl_Button NewB {
+        label NewB
+        callback {NewB_cb()}
+        xywh {20 80 115 165} color 61 selection_color 89 labelsize 34
+      }
+    }
+  }
+  Function {} {} {
+    code {scene = new Scene;} {}
+  }
+  Function {show()} {} {
+    code {uiw->show();} {}
+  }
+  Function {DBG_cb()} {} {
+    code {scene->DBG();} {}
+  }
+  Function {NewB_cb()} {} {
+    code {scene->NewB();} {selected
+    }
+  }
+} 
